@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Kicker-Magazin · SV Stadelhofen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow:wght@400;500;600;700&family=Orbitron:wght@600;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-0:#0a0f0c;
+    --bg-1:#141a15;
+    --red:#e2222a;
+    --red-dim:#7a1418;
+    --paper:#f7f4ec;
+    --paper-back:#efe9db;
+    --ink:#efeee8;
+    --muted:#8b978d;
+    --line:rgba(239,238,232,0.12);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;height:100%;}
+  body{
+    background:
+      radial-gradient(ellipse 900px 500px at 50% -10%, rgba(226,34,42,0.14), transparent 60%),
+      radial-gradient(ellipse 1200px 800px at 50% 110%, rgba(80,120,90,0.10), transparent 60%),
+      linear-gradient(180deg, var(--bg-1), var(--bg-0));
+    color:var(--ink);
+    font-family:'Barlow', sans-serif;
+    min-height:100%;
+    display:flex;
+    flex-direction:column;
+    overflow-x:hidden;
+  }
+
+  /* ---------- Header ---------- */
+  header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:18px 28px;
+    border-bottom:1px solid var(--line);
+    flex-wrap:wrap;
+    gap:12px;
+  }
+  .wordmark{
+    display:flex;
+    flex-direction:column;
+    line-height:1;
+  }
+  .wordmark .kicker{
+    font-family:'Anton', sans-serif;
+    font-size:clamp(22px, 4vw, 34px);
+    letter-spacing:1px;
+    color:var(--red);
+    text-shadow:0 2px 0 rgba(0,0,0,0.4);
+  }
+  .wordmark .club{
+    font-family:'Barlow', sans-serif;
+    font-weight:600;
+    letter-spacing:4px;
+    font-size:12px;
+    color:var(--muted);
+    margin-top:4px;
+    text-transform:uppercase;
+  }
+  .scoreboard{
+    font-family:'Orbitron', sans-serif;
+    font-weight:800;
+    font-size:20px;
+    color:var(--ink);
+    background:rgba(0,0,0,0.35);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:8px 16px;
+    letter-spacing:2px;
+  }
+  .scoreboard span{color:var(--red);}
+
+  /* ---------- Stage ---------- */
+  main{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:24px 16px 8px;
+    position:relative;
+  }
+
+  .stage{
+    position:relative;
+    width:min(78vh, 92vw, 640px);
+    aspect-ratio:595/842;
+    filter:drop-shadow(0 30px 60px rgba(0,0,0,0.55));
+  }
+
+  .book{
+    position:absolute;
+    inset:0;
+    perspective:2600px;
+  }
+
+  .leaf{
+    position:absolute;
+    inset:0;
+    transform-style:preserve-3d;
+    transform-origin:left center;
+    transition:transform 0.85s cubic-bezier(.4,.15,.2,1);
+    will-change:transform;
+  }
+  .leaf .face{
+    position:absolute;
+    inset:0;
+    backface-visibility:hidden;
+    border-radius:2px;
+    overflow:hidden;
+  }
+  .leaf .front{
+    background:var(--paper);
+  }
+  .leaf .front img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+    user-select:none;
+    -webkit-user-drag:none;
+  }
+  .leaf .back{
+    background:
+      linear-gradient(135deg, rgba(0,0,0,0.06), transparent 40%),
+      var(--paper-back);
+    transform:rotateY(180deg);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .leaf .back::before{
+    content:'';
+    position:absolute;
+    inset:0;
+    border-left:1px solid rgba(0,0,0,0.08);
+  }
+  .leaf .back .mark{
+    font-family:'Anton', sans-serif;
+    font-size:15px;
+    letter-spacing:2px;
+    color:rgba(0,0,0,0.18);
+    transform:rotate(180deg);
+    writing-mode:vertical-rl;
+  }
+  .leaf.shade .front::after{
+    content:'';
+    position:absolute;
+    inset:0;
+    background:linear-gradient(to left, rgba(0,0,0,0.22), transparent 30%);
+  }
+
+  /* click zones */
+  .zone{
+    position:absolute;
+    top:0; bottom:0;
+    width:50%;
+    cursor:pointer;
+    z-index:5000;
+  }
+  .zone.left{left:0;}
+  .zone.right{right:0;}
+
+  /* ---------- Controls ---------- */
+  .controls{
+    display:flex;
+    align-items:center;
+    gap:18px;
+    margin-top:20px;
+  }
+  .nav-btn{
+    width:44px;height:44px;
+    border-radius:50%;
+    border:1px solid var(--line);
+    background:rgba(255,255,255,0.03);
+    color:var(--ink);
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;
+    transition:background .2s, transform .2s, border-color .2s;
+    font-size:18px;
+  }
+  .nav-btn:hover{background:var(--red);border-color:var(--red);}
+  .nav-btn:disabled{opacity:0.25;cursor:default;}
+  .nav-btn:disabled:hover{background:rgba(255,255,255,0.03);border-color:var(--line);}
+
+  .hint{
+    font-size:12px;
+    color:var(--muted);
+    letter-spacing:1px;
+    text-transform:uppercase;
+  }
+
+  /* ---------- Thumbnails ---------- */
+  .thumbbar{
+    width:100%;
+    padding:18px 0 26px;
+    display:flex;
+    justify-content:center;
+  }
+  .thumbwrap{
+    display:flex;
+    gap:8px;
+    overflow-x:auto;
+    max-width:92vw;
+    padding:6px 10px;
+    scrollbar-width:thin;
+  }
+  .thumb{
+    flex:0 0 auto;
+    width:38px;
+    aspect-ratio:595/842;
+    border-radius:2px;
+    overflow:hidden;
+    border:2px solid transparent;
+    opacity:0.5;
+    cursor:pointer;
+    transition:opacity .2s, border-color .2s, transform .2s;
+  }
+  .thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+  .thumb:hover{opacity:0.85;}
+  .thumb.active{opacity:1;border-color:var(--red);transform:translateY(-3px);}
+
+  footer{
+    text-align:center;
+    padding:10px 16px 22px;
+    font-size:11px;
+    color:var(--muted);
+    letter-spacing:1px;
+  }
+
+  @media (max-width:560px){
+    header{padding:14px 16px;}
+    .thumb{width:30px;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wordmark">
+    <div class="kicker">KICKER&#8209;MAGAZIN</div>
+    <div class="club">SV Stadelhofen</div>
+  </div>
+  <div class="scoreboard"><span id="curNum">01</span> / <span id="totalNum">32</span></div>
+</header>
+
+<main>
+  <div class="stage">
+    <div class="book" id="book"></div>
+    <div class="zone left" id="zoneLeft" aria-label="Vorherige Seite"></div>
+    <div class="zone right" id="zoneRight" aria-label="N&auml;chste Seite"></div>
+  </div>
+
+  <div class="controls">
+    <button class="nav-btn" id="prevBtn" aria-label="Vorherige Seite">&#10094;</button>
+    <div class="hint">Klick auf die Seite oder Pfeiltasten zum Bl&auml;ttern</div>
+    <button class="nav-btn" id="nextBtn" aria-label="N&auml;chste Seite">&#10095;</button>
+  </div>
+</main>
+
+<div class="thumbbar">
+  <div class="thumbwrap" id="thumbwrap"></div>
+</div>
+
+<footer>SV Stadelhofen &middot; digitale Ausgabe</footer>
+
+<script>
+(function(){
+  const TOTAL = 32;
+  const bookEl = document.getElementById('book');
+  const thumbwrap = document.getElementById('thumbwrap');
+  const curNum = document.getElementById('curNum');
+  const totalNum = document.getElementById('totalNum');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+
+  totalNum.textContent = String(TOTAL).padStart(2,'0');
+
+  let current = 0; // index of first UNturned leaf (0-based) => visible page = current+1
+  const leaves = [];
+
+  function pad(n){ return String(n).padStart(2,'0'); }
+
+  for(let i=0;i<TOTAL;i++){
+    const leaf = document.createElement('div');
+    leaf.className = 'leaf';
+    leaf.style.zIndex = 1000 + (TOTAL - i);
+
+    const front = document.createElement('div');
+    front.className = 'face front';
+    const img = document.createElement('img');
+    img.src = 'pages/page-' + pad(i+1) + '.jpg';
+    img.loading = (i < 3) ? 'eager' : 'lazy';
+    img.alt = 'Seite ' + (i+1);
+    front.appendChild(img);
+
+    const back = document.createElement('div');
+    back.className = 'face back';
+    const mark = document.createElement('div');
+    mark.className = 'mark';
+    mark.textContent = 'SV STADELHOFEN';
+    back.appendChild(mark);
+
+    leaf.appendChild(front);
+    leaf.appendChild(back);
+    bookEl.appendChild(leaf);
+    leaves.push(leaf);
+
+    // thumbnail
+    const th = document.createElement('div');
+    th.className = 'thumb';
+    th.dataset.index = i;
+    const timg = document.createElement('img');
+    timg.src = 'pages/page-' + pad(i+1) + '.jpg';
+    timg.loading = 'lazy';
+    th.appendChild(timg);
+    th.addEventListener('click', ()=> goTo(i));
+    thumbwrap.appendChild(th);
+  }
+
+  function updateUI(){
+    curNum.textContent = pad(current+1);
+    prevBtn.disabled = current<=0;
+    nextBtn.disabled = current>=TOTAL-1;
+    document.querySelectorAll('.thumb').forEach(t=>{
+      t.classList.toggle('active', Number(t.dataset.index)===current);
+    });
+    const activeThumb = thumbwrap.querySelector('.thumb.active');
+    if(activeThumb){ activeThumb.scrollIntoView({inline:'center', block:'nearest', behavior:'smooth'}); }
+  }
+
+  function next(){
+    if(current>=TOTAL-1) return;
+    const leaf = leaves[current];
+    leaf.classList.add('shade');
+    leaf.style.transform = 'rotateY(-180deg)';
+    leaf.style.zIndex = current; // send under the unturned stack, ordered by index
+    current++;
+    updateUI();
+  }
+
+  function prev(){
+    if(current<=0) return;
+    current--;
+    const leaf = leaves[current];
+    leaf.style.zIndex = 1000 + (TOTAL - current);
+    leaf.style.transform = 'rotateY(0deg)';
+    setTimeout(()=> leaf.classList.remove('shade'), 850);
+    updateUI();
+  }
+
+  function goTo(target){
+    if(target===current) return;
+    if(target>current){
+      while(current<target) next();
+    } else {
+      while(current>target) prev();
+    }
+  }
+
+  document.getElementById('zoneLeft').addEventListener('click', prev);
+  document.getElementById('zoneRight').addEventListener('click', next);
+  nextBtn.addEventListener('click', next);
+  prevBtn.addEventListener('click', prev);
+
+  window.addEventListener('keydown', (e)=>{
+    if(e.key==='ArrowRight') next();
+    if(e.key==='ArrowLeft') prev();
+  });
+
+  // touch swipe
+  let touchStartX = null;
+  const stage = document.querySelector('.stage');
+  stage.addEventListener('touchstart', e=>{ touchStartX = e.touches[0].clientX; }, {passive:true});
+  stage.addEventListener('touchend', e=>{
+    if(touchStartX===null) return;
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    if(Math.abs(dx) > 40){ dx<0 ? next() : prev(); }
+    touchStartX = null;
+  }, {passive:true});
+
+  updateUI();
+})();
+</script>
+
+</body>
+</html>
