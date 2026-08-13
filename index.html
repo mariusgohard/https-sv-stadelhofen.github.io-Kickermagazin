@@ -297,7 +297,7 @@
     const front = document.createElement('div');
     front.className = 'face front';
     const img = document.createElement('img');
-    img.src = 'pages/page-' + pad(i+1) + '.jpg';
+    img.src = 'page-' + pad(i+1) + '.jpg';
     img.loading = (i < 3) ? 'eager' : 'lazy';
     img.alt = 'Seite ' + (i+1);
     front.appendChild(img);
@@ -319,7 +319,7 @@
     th.className = 'thumb';
     th.dataset.index = i;
     const timg = document.createElement('img');
-    timg.src = 'pages/page-' + pad(i+1) + '.jpg';
+    timg.src = 'page-' + pad(i+1) + '.jpg';
     timg.loading = 'lazy';
     th.appendChild(timg);
     th.addEventListener('click', ()=> goTo(i));
