@@ -100,22 +100,32 @@
     position:absolute;
     inset:0;
     perspective:2600px;
+    -webkit-perspective:2600px;
+    -webkit-transform:translate3d(0,0,0);
+    transform:translate3d(0,0,0);
   }
 
   .leaf{
     position:absolute;
     inset:0;
     transform-style:preserve-3d;
+    -webkit-transform-style:preserve-3d;
     transform-origin:left center;
-    transition:transform 0.85s cubic-bezier(.4,.15,.2,1);
+    -webkit-transform-origin:left center;
+    transition:-webkit-transform 0.85s cubic-bezier(.4,.15,.2,1), transform 0.85s cubic-bezier(.4,.15,.2,1);
     will-change:transform;
+    -webkit-transform:translate3d(0,0,0) rotateY(0deg);
+    transform:translate3d(0,0,0) rotateY(0deg);
   }
   .leaf .face{
     position:absolute;
     inset:0;
     backface-visibility:hidden;
+    -webkit-backface-visibility:hidden;
     border-radius:2px;
     overflow:hidden;
+    -webkit-transform:translate3d(0,0,0);
+    transform:translate3d(0,0,0);
   }
   .leaf .front{
     background:var(--paper);
@@ -132,6 +142,7 @@
     background:
       linear-gradient(135deg, rgba(0,0,0,0.06), transparent 40%),
       var(--paper-back);
+    -webkit-transform:rotateY(180deg);
     transform:rotateY(180deg);
     display:flex;
     align-items:center;
@@ -341,7 +352,7 @@
     if(current>=TOTAL-1) return;
     const leaf = leaves[current];
     leaf.classList.add('shade');
-    leaf.style.transform = 'rotateY(-180deg)';
+    leaf.style.transform = 'translate3d(0,0,0) rotateY(-180deg)';
     leaf.style.zIndex = current; // send under the unturned stack, ordered by index
     current++;
     updateUI();
@@ -352,7 +363,7 @@
     current--;
     const leaf = leaves[current];
     leaf.style.zIndex = 1000 + (TOTAL - current);
-    leaf.style.transform = 'rotateY(0deg)';
+    leaf.style.transform = 'translate3d(0,0,0) rotateY(0deg)';
     setTimeout(()=> leaf.classList.remove('shade'), 850);
     updateUI();
   }
